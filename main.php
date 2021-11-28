@@ -94,6 +94,35 @@ $router->addRoute('TweetFollow',
                   'following',
                   \tweeterapp\auth\TweeterAuthentification::ACCESS_LEVEL_USER);
 
+
+$router->addRoute('Like',
+                  '/like/',
+                  '\tweeterapp\control\TweeterController',
+                  'like',
+                  \tweeterapp\auth\TweeterAuthentification::ACCESS_LEVEL_USER);
+                  
+$router->addRoute('Dislike',
+                  '/dislike/',
+                  '\tweeterapp\control\TweeterController',
+                  'dislike',
+                  \tweeterapp\auth\TweeterAuthentification::ACCESS_LEVEL_USER);
+
+$router->addRoute('Follow',
+                  '/follow/',
+                  '\tweeterapp\control\TweeterController',
+                  'follow',
+                  \tweeterapp\auth\TweeterAuthentification::ACCESS_LEVEL_USER);
+
+$router->addRoute('Followee',
+                  '/followee/',
+                  '\tweeterapp\control\TweeterController',
+                  'followee',
+                  \tweeterapp\auth\TweeterAuthentification::ACCESS_LEVEL_USER);
+$router->addRoute('Follower',
+                  '/follower/',
+                  '\tweeterapp\control\TweeterController',
+                  'follower',
+                  \tweeterapp\auth\TweeterAuthentification::ACCESS_LEVEL_USER);
 $router->setDefaultRoute('/home/');
 
 $router->run();

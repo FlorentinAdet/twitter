@@ -19,9 +19,15 @@ class User extends \Illuminate\Database\Eloquent\Model {
        public function followedBy(){
          return $this->belongsToMany('tweeterapp\model\User','tweeterapp\model\Follow','followee','follower');
        }
-
        //Retourne les utilisateurs que l'auteur suit
        public function follows(){
           return $this->belongsToMany('tweeterapp\model\User','tweeterapp\model\Follow','follower','followee');
        }
+       public function alreadyFollow($idfollow,$idfollowee){
+        if(\tweeterapp\model\Follow::where("follower","=",$idfollow)->where("followee",'=',$idfollowee)->count() != 0){
+          return true;
+        }else{
+          return false;
+        }
+      } 
 }

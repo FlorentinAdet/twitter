@@ -37,8 +37,8 @@ class TweeterAdminController extends \mf\control\AbstractController {
         if(!empty($user)){
             $auth = new Authentification();
             $auth->login($user->username, $user->password, $_POST['user_pass'], $user->level);
-            $follows = $user->follows()->get();
-            $vue = new TweeterView($follows);
+           
+            $vue = new TweeterView($user);
             $vue->render("Follower");
         }else{
             Router::executeRoute('Connexion');
@@ -49,7 +49,6 @@ class TweeterAdminController extends \mf\control\AbstractController {
      * 
      */
     public function logout(){ 
-        var_dump('yes');
         $auth = new Authentification();
         $auth->logout();
         Router::executeRoute('Connexion');

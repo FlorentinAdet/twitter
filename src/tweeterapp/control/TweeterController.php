@@ -3,6 +3,8 @@
 namespace tweeterapp\control;
 use \tweeterapp\model\Tweet as Tweet;
 use \tweeterapp\model\User as User;
+use \tweeterapp\model\Like as Like;
+use \tweeterapp\model\Follow as Follow;
 use \tweeterapp\View\TweeterView as TweeterView;
 
 /* Classe TweeterController :
@@ -117,14 +119,9 @@ class TweeterController extends \mf\control\AbstractController {
         *
         */
       if(isset($_GET['id'])){
-          $tweets = Tweet::select()
-                          ->where('author',$_GET['id'])
-                          ->orderBy('id', 'DESC')
-                          ->get();
-          if(!empty($tweets)){ //On test si l'utilisateur a des tweets à afficher
-            $vue = new TweeterView($tweets);
+          $user = User::where('id',$_GET['id'])->first();
+            $vue = new TweeterView($user);
             $vue->render(2);
-          }
       }
     }
     /*Méthode viewUserTweets :
@@ -139,11 +136,76 @@ class TweeterController extends \mf\control\AbstractController {
 
     public function following(){
       $user = User::where('username',$_SESSION['user_login'])->first();
-      $follows = $user->follows()->get();
-      $vue = new TweeterView($follows);
-      $vue->render("Follower");
+      $vue = new TweeterView($user);
+      $vue->render("Following");
     }
 
+    public function like(){ 
+      $user = User::where('username','=',$_SESSION['user_login'])->first();
+      if(Like::where('user_id', '=', $user->id)->where('tweet_id', '=', $_GET["idtweet"])->first()!=null){
+        $tweet = Tweet::where("id",'=',$_GET['idtweet'])->first();
+      }else{
+        $like = new Like();
+        $like->user_id= $user->id;
+        $like->tweet_id=$_GET['idtweet'];
+        $like->save();
+        $tweet = Tweet::where("id",'=',$_GET['idtweet'])->first();
+        $likes = Like::where("tweet_id",'=',$_GET['idtweet'])->count();
+        $tweet->score = $likes;
+        $tweet->save();
+      }
+      $vue = new TweeterView($tweet);
+      $vue->render(1);
+    }
+
+    public function dislike(){
+      $user = User::where('username','=',$_SESSION['user_login'])->first();
+      $tweet = Tweet::where("id",'=',$_GET['idtweet'])->first();
+      if(Like::where('user_id', '=',  $user->id)->where('tweet_id', '=', $_GET["idtweet"])->first()!=null){
+        $like  = Like::where('user_id', '=',  $user->id)->where('tweet_id', '=', $_GET["idtweet"])->first();
+        $like->delete();
+        $likes = Like::where("tweet_id",'=',$_GET['idtweet'])->count();
+        $tweet->score = $likes;
+        $tweet->save();
+      }
+      $vue = new TweeterView($tweet);
+      $vue->render(1);
+    }
+
+    public function follow(){
+      $user = User::where('username',$_SESSION['user_login'])->first();
+      if(isset($_GET['idtweet'])){
+        $tweet = Tweet::where("id",'=',$_GET['idtweet'])->first();
+      }
+      if($user->alreadyFollow($user->id, $_GET['iduser']) == false){
+        if($_GET['iduser'] != $user->id){
+          $follow = new Follow();
+          $follow->follower = User::where('username','=',$_SESSION["user_login"])->first()->id;
+          $follow->followee = $_GET['iduser'];
+          $follow->save();
+          $nbfollow = Follow::where('followee','=',$user->id)->count();
+          $user->followers = $nbfollow; 
+          $user->save();
+        }
+      }
+      if(isset($_GET['idtweet'])){
+        $vue = new TweeterView($tweet);
+        $vue->render(1);
+      }else{
+        $vue = new TweeterView($user);
+        $vue->render("Followee");
+      }
+    }
+    public function followee(){
+      $user = User::where('username',$_SESSION['user_login'])->first();
+      $vue = new TweeterView($user);
+      $vue->render("Followee");
+    }
+    public function follower(){
+      $user = User::where('username',$_SESSION['user_login'])->first();
+      $vue = new TweeterView($user);
+      $vue->render("Follower");
+    }
     public function Envoie(){
       $user = User::where("username",'=',$_SESSION['user_login'])->first();
       $t = new Tweet();
