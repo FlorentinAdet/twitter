@@ -18,10 +18,12 @@ class TweeterView extends \mf\view\AbstractView {
      */
     private function renderHeader(){
         $router = new \mf\router\Router();        
-        
+        $urlHome = $router->urlFor("default");
         $res = "<header class='theme-backcolor1'>
                     <h1>MiniTweeTR</h1>
-                    <nav id='nav-menu'>  ".$this->renderTopMenu()."</nav>
+                    <nav id='nav-menu'>     
+                        <a class='button' href='".$urlHome."'><img  src='/html/home.png' width='45' height='45'></a>".$this->renderTopMenu()."
+                        </nav>
             </header>";
         return $res;
     }
@@ -33,16 +35,14 @@ class TweeterView extends \mf\view\AbstractView {
             $urlfollow = $router->urlFor("TweetFollow");
             $urldeco = $router->urlFor("Deconnexion");
             $urlfollower = $router->urlFor("Follower");
-            return "<a class='button' href='".$urlfollow."'><img  src='../../html/home.png' width='45' height='45'></a>
-            <a class='button' href='".$urlfollower."'><img  src='../../html/followees.png' width='45' height='45'></a>
-            <a class='button' href='".$urldeco."'><img  src='../../html/logout.png' width='45' height='45'></a>";
+            return "<a class='button' href='".$urlfollow."'><img  src='/html/homeG.png' width='45' height='45'></a>
+            <a class='button' href='".$urlfollower."'><img  src='/html/followees.png' width='45' height='45'></a>
+            <a class='button' href='".$urldeco."'><img  src='/html/logout.png' width='45' height='45'></a>";
         }else{
             $urlCo = $router->urlFor("Connexion");
             $urlInscri = $router->urlFor("CreerCompte");
-            $urlHome = $router->urlFor("default");
-            return "<a class='button' href='".$urlHome."'><img  src='../../html/home.png' width='45' height='45'></a>
-            <a class='button' href='".$urlCo."'><img  src='../../html/login.png' width='45' height='45'></a>
-            <a class='button' href='".$urlInscri."'><img  src='../../html/signup.png' width='45' height='45'></a>";
+            return  "<a class='button' href='".$urlCo."'><img  src='/html/login.png' width='45' height='45'></a>
+            <a class='button' href='".$urlInscri."'><img  src='/html/signup.png' width='45' height='45'></a>";
         }
     }
     /* Méthode renderFooter
@@ -114,7 +114,7 @@ class TweeterView extends \mf\view\AbstractView {
 
     /* Méthode renderViewTweet
      *
-     * Rréalise la vue de la fonctionnalité affichage d'un tweet
+     * Réalise la vue de la fonctionnalité affichage d'un tweet
      *
      */
 
@@ -134,7 +134,7 @@ class TweeterView extends \mf\view\AbstractView {
     }
     /** Méthode renderTweet
      * 
-     * Renvoie la structure d'une tweet 
+     * Renvoie la structure d'un tweet 
      * 
      */
     private function renderTweet($tweet,$check = 0){
@@ -142,7 +142,6 @@ class TweeterView extends \mf\view\AbstractView {
         $auteur = $tweet->author()->first();
         $tabVal['id'] = $tweet->id;
         $tabValA['id'] = $auteur->id;
-        $user = \tweeterapp\model\User::where('username',$_SESSION['user_login'])->first();
         $url = $router->urlFor("VoirTweet",$tabVal);
         $urlA = $router->urlFor("VoirUser",$tabValA);
         $res = "<div class='tweet'>
@@ -159,6 +158,7 @@ class TweeterView extends \mf\view\AbstractView {
                     <div class='tweet-footer'>
                                         <span class='tweet-score tweet-control'>".$tweet->score."</span>";
                     if($check == 1 && isset($_SESSION['user_login'])){
+                        $user = \tweeterapp\model\User::where('username',$_SESSION['user_login'])->first();
                         $tab['idtweet'] = $tweet->id;
                         $tab['iduser'] = $auteur->id;
                         $urlLike = $router->urlFor("Like",$tab);
@@ -202,16 +202,17 @@ class TweeterView extends \mf\view\AbstractView {
          $router = new \mf\router\Router();
          $urlEnvoie = $router->urlFor("EnvoyerTweet");
          $res = '<form action="'.$urlEnvoie.'" method="post">
-                    <textarea id="tweet-form" name="text" placeholder="Entrer votre message.." ,="" maxlength="140"></textarea>
+                    <textarea id="tweet-form" name="text" placeholder="Entrer votre message.." ,="" maxlength="255" required></textarea>
                     <div><input id="send_button" type="submit" name="send" value="Send"></div>
                   </form>';
          return $res;
     }
     /**
+     * Méthode renderLogin
      * 
+     * Retourne le fragment HTML de la connexion
      */
     protected function renderLogin(){
-        
         $router = new \mf\router\Router();        
         $url = $router->urlFor("CheckCo");
         $res = '<section>
@@ -228,7 +229,9 @@ class TweeterView extends \mf\view\AbstractView {
         return $res;
     }
     /**
+     * Méthode renderFollowing
      * 
+     * Retourne le fragment HMTL qui affiche les tweets des personnes que l'on suit 
      */
     protected function renderFollowing(){
         $router = new \mf\router\Router();
@@ -237,7 +240,7 @@ class TweeterView extends \mf\view\AbstractView {
         $urlfollower = $router->urlFor("Followee");
         $res = '<section>
                     <article class="theme-backcolor2">
-                    <h3>Tweets de vos followers :</h3>';
+                    <h3>Tweets de vos follow :</h3>';
                     foreach ($follows as $user) {
                         $tweets = $user->tweets()->get();
                         foreach ($tweets as $t) {
@@ -249,7 +252,9 @@ class TweeterView extends \mf\view\AbstractView {
         return $res;
     }
     /**
+     * Méthode renderSignup
      * 
+     * Retourne le fragment HTML qui affiche le formulaire d'inscription
      */
     protected function renderSignup(){
         $router = new \mf\router\Router();        
@@ -264,7 +269,9 @@ class TweeterView extends \mf\view\AbstractView {
         return $res;
     }
     /**
+     * Méthode renderFollower
      * 
+     * Retourne le fragment HTML de la page des personnes que l'on follow et le nombre de personne qui nous follow
      */
     public function renderFollower(){
         $router = new \mf\router\Router();
@@ -286,7 +293,9 @@ class TweeterView extends \mf\view\AbstractView {
         return $res;
     }
     /**
+     * Méthode renderFollowee
      * 
+     * Retourne le fragment HTML pour afficher les personnes qui nous follow 
      */
     protected function renderFollowee(){
         $router = new \mf\router\Router(); 
@@ -324,8 +333,6 @@ class TweeterView extends \mf\view\AbstractView {
          * voire la classe AbstractView
          *
         */     
-        
-        var_dump($_SESSION['user_login']);   
         $html = $this->renderHeader();
         $html .= '<section><article class="theme-backcolor2">';
         if($selector == 1){
@@ -338,12 +345,12 @@ class TweeterView extends \mf\view\AbstractView {
             $html .= $this->renderLogin();
         }else if($selector == "Following"){
             $html .= $this->renderFollowing();
-        }else if($selector == "Signup"){
-            $html .= $this->renderSignup();
         }else if($selector == "Followee"){
             $html .= $this->renderFollowee();
         }else if($selector == "Follower"){
             $html .= $this->renderFollower();
+        }else if($selector == "Signup"){
+            $html .= $this->renderSignup();
         }else{
             $html .= $this->renderHome();
         }

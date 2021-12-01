@@ -133,13 +133,21 @@ class TweeterController extends \mf\control\AbstractController {
       $vue = new TweeterView("");
       $vue->render(3);
     }
-
+    /**
+     * Méthode following 
+     * 
+     * Réalise la fonctionnalité afficher 
+     */
     public function following(){
       $user = User::where('username',$_SESSION['user_login'])->first();
       $vue = new TweeterView($user);
       $vue->render("Following");
     }
-
+    /**
+     * Méthode likes
+     * 
+     * Réalise la fonctionnalité like un tweets
+     */
     public function like(){ 
       $user = User::where('username','=',$_SESSION['user_login'])->first();
       if(Like::where('user_id', '=', $user->id)->where('tweet_id', '=', $_GET["idtweet"])->first()!=null){
@@ -157,7 +165,11 @@ class TweeterController extends \mf\control\AbstractController {
       $vue = new TweeterView($tweet);
       $vue->render(1);
     }
-
+    /**
+     * Méthode dislike
+     * 
+     * Réalise la fonctionnalité  dislike d'un tweet 
+     */
     public function dislike(){
       $user = User::where('username','=',$_SESSION['user_login'])->first();
       $tweet = Tweet::where("id",'=',$_GET['idtweet'])->first();
@@ -171,7 +183,11 @@ class TweeterController extends \mf\control\AbstractController {
       $vue = new TweeterView($tweet);
       $vue->render(1);
     }
-
+    /**
+     * Méthode follow
+     * 
+     * Réalise la fonctionnalité follow un utilisateur
+     */
     public function follow(){
       $user = User::where('username',$_SESSION['user_login'])->first();
       if(isset($_GET['idtweet'])){
@@ -196,16 +212,31 @@ class TweeterController extends \mf\control\AbstractController {
         $vue->render("Followee");
       }
     }
+    /**
+     * Méthode followee
+     * 
+     * Réalise la fonctionnalité afficher les personnes qui nous follow
+     */
     public function followee(){
       $user = User::where('username',$_SESSION['user_login'])->first();
       $vue = new TweeterView($user);
       $vue->render("Followee");
     }
+    /**
+     * Méthode follower
+     * 
+     * Réalise la fonctionnalité afficher nos follow 
+     */
     public function follower(){
       $user = User::where('username',$_SESSION['user_login'])->first();
       $vue = new TweeterView($user);
       $vue->render("Follower");
     }
+    /**
+     * Méthode Envoie
+     * 
+     * Réalise la fonctionnalité de création d'un nouveau tweet
+     */
     public function Envoie(){
       $user = User::where("username",'=',$_SESSION['user_login'])->first();
       $t = new Tweet();

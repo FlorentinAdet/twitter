@@ -37,7 +37,7 @@ class  Authentification extends AbstractAuthentification {
     }
     public function login($username, $db_pass, $given_pass, $level){
       if(password_verify($given_pass,$db_pass)===false){
-          throw new exception\AuthentificationException();
+          throw new exception\AuthentificationException("mauvais mot de passe");
       }else{
         self::updateSession($username, $level);
       }
